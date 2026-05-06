@@ -35,4 +35,4 @@ jobs:
       run: kind load docker-image myapp:latest --name kind
 
     - name: Deploy to Kubernetes
-      run: kubectl apply -f deployment.yaml
+      run: kubectl apply -f deployment.yml
