@@ -30,4 +30,4 @@ jobs:
         export KUBECONFIG=kubeconfig 
     - name: Deploy to Kubernetes
       run: |
-        kubectl apply -f deployment.yaml
+        kubectl apply -f deployment.yml
