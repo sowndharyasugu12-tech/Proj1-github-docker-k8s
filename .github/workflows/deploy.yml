@@ -4,30 +4,35 @@ on:
   push:
     branches:
       - master
-  workflow_dispatch:
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout master branch
+    - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install Kind
+      run: |
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
+
+    - name: Install kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+
+    - name: Create Kind cluster
+      run: kind create cluster --name kind
+
     - name: Build Docker image
-      run: docker build -t myapp -f ./master/dockerfile .
+      run: docker build -t myapp:latest .
 
-    - name: Login to DockerHub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Load image into Kind
+      run: kind load docker-image myapp:latest --name kind
 
-    - name: Tag & Push
-      run: |
-        docker tag myapp ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-    - name: Setup kubeconfig
-      run: |
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > kubeconfig
-        export KUBECONFIG=kubeconfig 
     - name: Deploy to Kubernetes
-      run: |
-        kubectl apply -f deployment.yaml
+      run: kubectl apply -f deployment.yaml
