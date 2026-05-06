@@ -1,0 +1,23 @@
+{
+  "name": "proj1-github-docker-k8s",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sowndharyasugu12-tech/Proj1-github-docker-k8s.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sowndharyasugu12-tech/Proj1-github-docker-k8s/issues"
+  },
+  "homepage": "https://github.com/sowndharyasugu12-tech/Proj1-github-docker-k8s#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
