@@ -38,8 +38,6 @@ jobs:
       run: kind load docker-image myapp:latest --name kind
 
     - name: Deploy to Kubernetes
-      env:
-      KUBECONFIG: ${{ github.workspace }}/kubeconfig
       run: |
        kubectl apply -f deployment.yml
        kubectl apply -f service.yml
