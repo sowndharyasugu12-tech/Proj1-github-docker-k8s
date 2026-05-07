@@ -30,7 +30,10 @@ jobs:
     - name: Remove control-plane taint
       run: |
          kubectl taint nodes --all node-role.kubernetes.io/control-plane-
-
+    - name: Wait for cluster
+      run: |
+          kubectl wait --for=condition=Ready nodes --all --timeout=120s
+          
     - name: Build Docker image
       run: docker build -t myapp:latest .
 
