@@ -1,35 +1,56 @@
-name: CI-CD Pipeline
+name: CI-CD Pipeline k8s
 
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
 
 jobs:
   build-deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout master branch
+    - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install Kind
+      run: |
+        curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+        chmod +x ./kind
+        sudo mv ./kind /usr/local/bin/kind
+
+    - name: Install kubectl
+      run: |
+        curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
+        chmod +x kubectl
+        sudo mv kubectl /usr/local/bin/
+
+    - name: Create Kind cluster
+      run: kind create cluster --name kind
+    - name: Wait for cluster
+      run: |
+          kubectl wait --for=condition=Ready nodes --all --timeout=120s
+          
     - name: Build Docker image
-      run: docker build -t myapp -f dockerfile .
+      run: docker build -t myapp:latest .
 
-    - name: Login to DockerHub
-      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+    - name: Load image into Kind
+      run: kind load docker-image myapp:latest --name kind
 
-    - name: Tag & Push
-      run: |
-        docker tag myapp ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-        docker push ${{ secrets.DOCKER_USERNAME }}/myapp:latest
-    - name: Setup kubeconfig
-      run: |
-        echo "${{ secrets.KUBE_CONFIG }}" | base64 --decode > kubeconfig
-        export KUBECONFIG=kubeconfig 
     - name: Deploy to Kubernetes
       env:
       KUBECONFIG: ${{ github.workspace }}/kubeconfig
       run: |
-        kubectl apply -f deployment.yml
+       kubectl apply -f deployment.yml
+       kubectl apply -f service.yml
+
+    - name: Verify deployment
+      run: |
+       kubectl get pods
+       kubectl describe pod $(kubectl get pods -o jsonpath='{.items[0].metadata.name}')
+       kubectl get svc
+    - name: Test app
+      run: |
+       kubectl port-forward service/myapp-service 8080:80 &
+       sleep 20
+       curl -f http://localhost:8080
