@@ -14,6 +14,6 @@ spec:
     spec:
       containers:
       - name: myapp
-        image: ${{ secrets.DOCKER_USER }}/myapp:latest
+        image: myapp:latest
         ports:
         - containerPort: 3000
