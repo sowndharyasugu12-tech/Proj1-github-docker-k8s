@@ -45,6 +45,7 @@ jobs:
     - name: Verify deployment
       run: |
        kubectl get pods
+       kubectl describe pods
        kubectl describe pod $(kubectl get pods -o jsonpath='{.items[0].metadata.name}')
        kubectl get svc
     - name: Test app
