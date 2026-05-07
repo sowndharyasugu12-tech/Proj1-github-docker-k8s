@@ -36,6 +36,10 @@ jobs:
 
     - name: Load image into Kind
       run: kind load docker-image myapp:latest --name kind
+      
+    - name: Verify image inside kind
+      run: |
+        docker exec kind-control-plane crictl images
 
     - name: Deploy to Kubernetes
       run: |
@@ -44,7 +48,7 @@ jobs:
 
     - name: Verify deployment
       run: |
-       kubectl get pods
+       kubectl get pods -o wide
        kubectl describe pods
        kubectl describe pod $(kubectl get pods -o jsonpath='{.items[0].metadata.name}')
        kubectl get svc
