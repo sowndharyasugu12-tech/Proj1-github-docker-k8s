@@ -27,6 +27,9 @@ jobs:
 
     - name: Create Kind cluster
       run: kind create cluster --name kind
+    - name: Remove control-plane taint
+      run: |
+         kubectl taint nodes --all node-role.kubernetes.io/control-plane-
 
     - name: Build Docker image
       run: docker build -t myapp:latest .
