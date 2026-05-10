@@ -67,109 +67,15 @@ Developer Pushes Code to GitHub
 # Application
 
 Simple Node.js application exposed on port 3000.
-
-Example:
-
-```javascript
-const express = require('express')
-const app = express()
-
-app.get('/', (req, res) => {
-  res.send('CI/CD Pipeline Working Successfully!')
-})
-
-app.listen(3000, () => {
-  console.log('Application running on port 3000')
-})
-```
-
 ---
 
 # Docker Setup
-
-## Dockerfile
-
-```dockerfile
-FROM node:18-alpine
-
-WORKDIR /app
-
-COPY . .
-
-RUN npm install
-
-EXPOSE 3000
-
-CMD ["node", "app.js"]
-```
-
-## Build Docker Image
-
-```bash
-docker build -t myapp .
-```
-
-## Run Container
-
-```bash
-docker run -p 3000:3000 myapp
-```
-
-Application URL:
-
-```text
-http://localhost:3000
-```
-
+Build and containarize the application
 ---
 
 # Kubernetes Setup
 
-## Deployment YAML
-
-```yaml
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: myapp-deployment
-spec:
-  replicas: 2
-  selector:
-    matchLabels:
-      app: myapp
-  template:
-    metadata:
-      labels:
-        app: myapp
-    spec:
-      containers:
-      - name: myapp
-        image: myapp:latest
-        imagePullPolicy: Never
-        ports:
-        - containerPort: 3000
-```
-
----
-
-## Service YAML
-
-```yaml
-apiVersion: v1
-kind: Service
-metadata:
-  name: myapp-service
-spec:
-  type: NodePort
-  selector:
-    app: myapp
-  ports:
-    - port: 80
-      targetPort: 3000
-      nodePort: 30007
-```
-
----
+Deployed application to kind k8s cluster
 
 # Kubernetes Concepts Learned
 
@@ -192,107 +98,14 @@ Browser → NodePort → Service Port → TargetPort → Application
 
 # Kind Cluster Setup
 
-## Install Kind
 
-```bash
-curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
-chmod +x ./kind
-sudo mv ./kind /usr/local/bin/kind
-```
-
-## Create Cluster
-
-```bash
-kind create cluster --name kind
-```
-
-## Verify Cluster
-
-```bash
-kubectl get nodes
-```
-
----
-
-# Deploy Application to Kubernetes
-
-```bash
-kubectl apply -f deployment.yaml
-kubectl apply -f service.yaml
-```
-
-## Verify Resources
-
-```bash
-kubectl get pods
-kubectl get svc
-kubectl get deployments
-```
-
----
 
 # Access Application Locally
 
-## Using Port Forwarding
 
-```bash
-kubectl port-forward service/myapp-service 8080:80
-```
-
-Application URL:
-
-```text
-http://localhost:8080
-```
-
----
 
 # GitHub Actions CI/CD Pipeline
 
-## Workflow File
-
-```yaml
-name: CI-CD Pipeline
-
-on:
-  push:
-    branches:
-      - master
-
-jobs:
-  build-deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-    - name: Checkout master branch
-      uses: actions/checkout@v3
-
-    - name: Install kind
-      run: |
-        curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.20.0/kind-linux-amd64
-        chmod +x ./kind
-        sudo mv ./kind /usr/local/bin/kind
-
-    - name: Install kubectl
-      run: |
-        curl -LO "https://dl.k8s.io/release/$(curl -s https://dl.k8s.io/release/stable.txt)/bin/linux/amd64/kubectl"
-        chmod +x kubectl
-        sudo mv kubectl /usr/local/bin/
-
-    - name: Create kind cluster
-      run: kind create cluster --name kind
-
-    - name: Build Docker image
-      run: docker build -t myapp:latest .
-
-    - name: Load image into kind
-      run: kind load docker-image myapp:latest --name kind
-
-    - name: Deploy to Kubernetes
-      run: kubectl apply -f deployment.yaml
-```
-
----
 
 # GitHub Secrets Used
 
