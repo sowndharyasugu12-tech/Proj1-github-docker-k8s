@@ -180,12 +180,12 @@ Used Kubernetes port-forwarding.
 
 # Future Improvements
 
-* Implement Rolling Updates
-* Add Readiness and Liveness Probes
-* Use Kustomize for dev/prod environments
+* Rolling Updates
+* Readiness and Liveness Probes
+* Kustomize for dev/prod environments
 * Deploy to cloud Kubernetes (EKS/GKE/AKS)
-* Add Ingress Controller
-* Add Monitoring and Logging
+* Ingress Controller
+* Monitoring and Logging
 
 ---
 
